@@ -5,7 +5,6 @@ from my_utils.getWinNumsToCSV import *
 import qr_reader
 
 
-# sys.path.append('/Users/darkred/Documents/btc_project')
 
 
 if 'file_uploader' not in st.session_state:
@@ -30,11 +29,11 @@ def uploader_callback():
         st.session_state['load_imgs'] = st.session_state['file_uploader']
 
 
-def say_hello():
-   db_path = 'my_utils/lotto_number_DB.csv'
-   info, round = crawlingLottoData(db_path)
-   st.write(info)
-   st.write(round)
+# def say_hello():
+#    db_path = 'my_utils/lotto_number_DB.csv'
+#    info, round = crawlingLottoData(db_path)
+#    st.write(info)
+#    st.write(round)
 
 
 
@@ -113,8 +112,8 @@ html2 = """
         }
     </style>
 """
-st.markdown(html2, unsafe_allow_html=True)
 
+st.markdown(html2, unsafe_allow_html=True)
 
 with st.form("my-form", clear_on_submit=True):
     uploaded_image = st.file_uploader('image : ',key='file_uploader',
@@ -130,9 +129,11 @@ for idx, filteredImage in enumerate(st.session_state['load_imgs']):
     
 
 
-if st.button('분석'):
-    imgs = [Image.open(f) for f in st.session_state['load_imgs']]
-    qr_reader.get_number_from_image(imgs)
+# if st.button('분석'):
+#     imgs = [Image.open(f) for f in st.session_state['load_imgs']]
+#     qr_reader.get_number_from_image(imgs)
 
-    # say_hello()
+#     # say_hello()
     
+if st.button('test'):
+    st.write('new_df')

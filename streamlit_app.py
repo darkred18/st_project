@@ -1,10 +1,8 @@
 import streamlit as st
 from itertools import cycle
 from PIL import Image
-from my_utils.getWinNumsToCSV import *
+from my_utils.getWinNumsToCSV import crawlingLottoData
 import qr_reader
-
-# sys.path.append('/Users/darkred/Documents/btc_project')
 
 
 if 'file_uploader' not in st.session_state:

@@ -1,6 +1,11 @@
 import requests
-from stqdm import stqdm
+# from tqdm import tqdm
 import pandas as pd
+
+# def crawlingLottoData(fullPath, update = True):
+#     print('crawlingLottoData')
+#     # model = pd.read_csv(fullPath)
+
 
 # def get_lastRound_data(path):
 #     model = pd.read_csv(path)
@@ -41,7 +46,7 @@ def getLottoWinInfo(startRound, endRound):
     firstWinamnt = [] 
     roundNo = []
     
-    for i in stqdm(range(startRound, endRound+1, 1)): 
+    for i in range(startRound, endRound+1, 1): 
         
         # i = 1
         
