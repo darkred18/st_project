@@ -131,7 +131,11 @@ if st.button('분석'):
     imgs = [Image.open(f) for f in st.session_state['load_imgs']]
     res = qr_reader.get_number_from_image(imgs)
 
-    st.write(res)
+    for r in res:
+        round, nums = r[0]
+        st.write('회차 : '+round)
+        for n in nums:
+            st.text(str(n))
 
-    # say_hello()
+
     
