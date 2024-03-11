@@ -3,25 +3,10 @@ from PIL import Image
 from pprint import pprint
 import re, glob
 
-# test = 'http://m.dhlottery.co.kr/?v=0969m061113313241m041025273842m020819293445m011119293841q0205232531411998386727'
-
-# t = re.split('[m,q]',test.split('=')[1])
-# print(t)
-
-
-
-
-# img = Image.open('qr_images/rr/IMG_2369.JPG')
-# img.show()
 
 def get_number_qr(code):
-    # s = 'http://m.dhlottery.co.kr/?v=1003m010429394345m010429394345m010429394345m010429394345m0104293943451989'
-    # http://m.dhlottery.co.kr/?v=0969m061113313241m041025273842m020819293445m011119293841q0205232531411998386727
-    # t = code.split('=')[1]
-
     try:
         nums = re.split('[m,q]',code.split('=')[1])
-
     except:
         print('except  : qr_reader.py 14번줄')
 
@@ -35,6 +20,8 @@ def get_number_from_image(imgs:list):
     res = []
     for img in imgs:
         decoded = decode(img)
+        if decoded == []:
+            continue
         res_img = []
         for dc in decoded:
             d_data = dc.data.decode('utf-8')

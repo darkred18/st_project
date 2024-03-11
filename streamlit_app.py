@@ -5,11 +5,23 @@ from my_utils.getWinNumsToCSV import crawlingLottoData
 import qr_reader
 
 
+
+
 if 'file_uploader' not in st.session_state:
     st.session_state['load_imgs'] = []
     st.session_state['load_names'] = []
     st.session_state['button_label'] = "Load"
 
+def image_resize(f_imgs):
+    imgs = [Image.open(f) for f in f_imgs]
+    for img in imgs:
+        w,h = img.size
+        img_width = 640 if w > h else 480
+        if w <= img_width: continue
+        img_ratio = img_width/float(w)
+        img_height = int((h * img_ratio)) 
+        img = img.resize((img_width,img_height))
+    return imgs
 
 def uploader_callback():
     if st.session_state['file_uploader'] != []:
@@ -20,7 +32,9 @@ def uploader_callback():
             if img.name not in name_list:
                 name_list.append(img.name)
                 img_list.append(img)
-        st.session_state['load_imgs'] = img_list
+
+        img_resized = image_resize(img_list)
+        st.session_state['load_imgs'] = img_resized
         st.session_state['load_names'] = name_list
     else:
         st.session_state['button_label'] = "Load"
@@ -128,14 +142,16 @@ for idx, filteredImage in enumerate(st.session_state['load_imgs']):
     
 
 if st.button('분석'):
-    imgs = [Image.open(f) for f in st.session_state['load_imgs']]
-    res = qr_reader.get_number_from_image(imgs)
-
-    for r in res:
-        round, nums = r[0]
-        st.write('회차 : '+round)
-        for n in nums:
-            st.text(str(n))
+    # imgs = [Image.open(f) for f in st.session_state['load_imgs']]
+    res = qr_reader.get_number_from_image(st.session_state['load_imgs'])
+    if res == []:
+        st.write('qr코드 읽지 못함.')
+    else:
+        for r in res:
+            round, nums = r[0]
+            st.write('회차 : '+round)
+            for n in nums:
+                st.text(str(n))
 
 
     
