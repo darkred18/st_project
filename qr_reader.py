@@ -7,14 +7,15 @@ import re, glob
 def get_number_qr(code):
     try:
         nums = re.split('[m,q]',code.split('=')[1])
+        round = nums.pop(0)
+        for n in range(len(nums)):
+            tn = nums[n]
+            nums[n] = [int(tn[i:i+2]) for i in range(0, 12, 2)]
+        return round, nums
     except:
         print('except  : qr_reader.py 14번줄')
+        return None,None
 
-    round = nums.pop(0)
-    for n in range(len(nums)):
-        tn = nums[n]
-        nums[n] = [int(tn[i:i+2]) for i in range(0, 12, 2)]
-    return round, nums
 
 def get_number_from_image(imgs:list):
     res = []
@@ -26,13 +27,14 @@ def get_number_from_image(imgs:list):
         for dc in decoded:
             d_data = dc.data.decode('utf-8')
             # d_type = dc.type
-            print('======================')
+            # print('======================')
             # print('d_data : ', d_data)
             round, nums = get_number_qr(d_data)
-            print('회차 : ', round)
-            pprint(nums)
-            print('----------------------')
-            res_img.append((round,nums))
+            # print('회차 : ', round)
+            # pprint(nums)
+            # print('----------------------')
+            if round:
+                res_img.append((round,nums))
         res.append(res_img)
     return res
 
