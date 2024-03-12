@@ -1,11 +1,10 @@
 import streamlit as st
 from itertools import cycle
 from PIL import Image
-from my_utils.getWinNumsToCSV import crawlingLottoData
+from PIL import ImageOps
+
+from my_utils.getWinNumsToCSV import crawlingLottoData, analyze_nums
 import qr_reader
-
-
-
 
 if 'file_uploader' not in st.session_state:
     st.session_state['load_imgs'] = []
@@ -13,7 +12,10 @@ if 'file_uploader' not in st.session_state:
     st.session_state['button_label'] = "Load"
 
 def image_resize(f_imgs):
-    imgs = [Image.open(f) for f in f_imgs]
+    #이미지가 자동으로 회전되는 현상을 막아줌.
+    #ImageOps.exif_transpose(image)
+    imgs = [ImageOps.exif_transpose(Image.open(f)) for f in f_imgs]
+
     for img in imgs:
         w,h = img.size
         img_width = 640 if w > h else 480
@@ -135,23 +137,25 @@ with st.form("my-form", clear_on_submit=True):
     with c3_2:
         submitted = st.form_submit_button(st.session_state['button_label'],on_click=uploader_callback)
 
-
 cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
 for idx, filteredImage in enumerate(st.session_state['load_imgs']):
     next(cols).image(filteredImage, width=150, caption=st.session_state['load_names'][idx],use_column_width=True)
-    
 
 if st.button('분석'):
-    # imgs = [Image.open(f) for f in st.session_state['load_imgs']]
     res = qr_reader.get_number_from_image(st.session_state['load_imgs'])
     if res == []:
         st.write('qr코드 읽지 못함.')
     else:
         for r in res:
             round, nums = r[0]
-            st.write('회차 : '+round)
-            for n in nums:
-                st.text(str(n))
+            res = analyze_nums(int(round),nums)
+            if res:
+                st.write(round + '회차 당첨')
+                for n in nums:
+                    st.text(str(n))
+            else:
+                st.write(round + '회차 낙첨')
+
 
 
     

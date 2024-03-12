@@ -11,6 +11,8 @@ import pandas as pd
 #     model = pd.read_csv(path)
 #     return int(model["회차"].to_list()[-1])
 
+db_path = 'my_utils/lotto_number_DB.csv'
+
 def crawlingLottoData(fullPath, update = True):
 
     model = pd.read_csv(fullPath)
@@ -143,6 +145,19 @@ def update_lotto_db(path, idx):
 
     return (roundNo[-1], drwNoDate[-1])
 
+def analyze_nums(round ,nums):
+    df = pd.read_csv(db_path,index_col='회차')
+    win_nums = df.loc[round,'No.1':'No.6']
+    # print(round)
+    # print(win_nums.values)
+    res_nums = []
+    for num in nums:
+        res_num = list(set(num) & set(win_nums.values))
+        if len(res_num) > 3:
+            res_nums.append(res_num)
+    return res_nums
+        
+        
 # 연금 복권
 def getPensionWinInfo(startRound, endRound):
     roundNo = []
