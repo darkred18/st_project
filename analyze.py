@@ -17,6 +17,6 @@ if files:
 
 if st.button("Clear uploaded files"):
     st.session_state["file_uploader_key"] += 1
-    st.experimental_rerun()
+    st.rerun()
 
 st.write("Uploaded files:", st.session_state["uploaded_files"])

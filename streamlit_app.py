@@ -7,11 +7,13 @@ import qr_reader
 from my_utils.getWinNumsToCSV import crawlingLottoData, analyze_nums
 
 
-if 'file_uploader' not in st.session_state:
-    st.session_state['button_label'] = "Load"
-    st.session_state['load_imgs'] = []
-    st.session_state['load_names'] = []
-    st.session_state['check_box'] = []
+if 'file_uploader_key' not in st.session_state:
+    st.session_state['file_uploader_key']   = 0
+    st.session_state['button_label']    = "Load"
+    st.session_state['file_uploader']   = []
+    st.session_state['load_imgs']       = []
+    st.session_state['load_names']      = []
+    st.session_state['check_box']       = []
     # st.session_state['names'] = {}
 
 # def image_resize(f_imgs):
@@ -30,41 +32,36 @@ if 'file_uploader' not in st.session_state:
 
 
 
-# [data-testid="StyledFullScreenButton"] {
-#             right: 0;
-#             top: 0;
-#             height: 1.5rem;
-#             width: 1.5rem;
-#         }
-        
-#         img {
-#             max-height: 300px;
-#         }
-#         img:hover {
-#             transform: scale(1);
-#             border:1px solid blue;
-#         }
-#         img:active {
-#             transform: scale(1.1);
-#         }
-    
-
 css = """
     <style>
+        [data-testid="StyledFullScreenButton"] {
+                right: 0;
+                top: 0;
+                height: 1.5rem;
+                width: 1.5rem;
+            }
+            
+        img {
+            max-height: 300px;
+        }
+        img:hover {
+            transform: scale(1);
+            border:1px solid blue;
+        }
+        img:active {
+            transform: scale(1.1);
+        }
         .uploadedFiles {
             display: none;
         }
     </style>
 """
-# st.markdown(css, unsafe_allow_html=True)
+st.markdown(css, unsafe_allow_html=True)
 
 def uploader_callback():
     if st.session_state['file_uploader'] != []:
         st.session_state['button_label'] = "Clear"
-        temp_cnt = len(st.session_state['file_uploader'])
-        # img_list = []
-        # name_list = []
-        # check_list = []
+        # temp_cnt = len(st.session_state['file_uploader'])
         img_list = st.session_state['load_imgs']
         name_list = st.session_state['load_names']
         check_list = st.session_state['check_box']
@@ -87,9 +84,6 @@ def uploader_callback():
         st.session_state['button_label']    = "Load"
         st.session_state['load_imgs']       = st.session_state['file_uploader']
 
-# def test(s):
-#     print('test_'+s)
-
 def remove_image(idx_list):
     for i in reversed(idx_list):
         del st.session_state['load_names'][i]
@@ -105,30 +99,34 @@ def test_btn_evnt():
     
     remove_image(checked)
 
-    st.write(checked)
-    st.write(st.session_state['load_names'])
-    st.write('체크박스 개수 :  %d'%len(chk_box) )
-    st.write('이미지 개수 :  %d'%len(st.session_state['load_names']) )
+    # st.write(checked)
+    # st.write(st.session_state['load_names'])
+    # st.write('체크박스 개수 :  %d'%len(chk_box) )
+    # st.write('이미지 개수 :  %d'%len(st.session_state['load_names']) )
     
 
 
 # streamlit =======================================
 
-uploaded_images = st.file_uploader('image : ', key='file_uploader',on_change=uploader_callback,
+uploaded_images = st.file_uploader('image : ', key=st.session_state['file_uploader_key'],
                             accept_multiple_files=True )
 
-
+if uploaded_images:
+    st.session_state['file_uploader'] = uploaded_images
+    uploader_callback()
 
 cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
 for idx, filteredImage in enumerate(st.session_state['load_imgs']):
     name = st.session_state['load_names'][idx]
     with next(cols):
-        st.session_state['check_box'][idx] = st.checkbox(name, key=name)
         st.image(filteredImage, use_column_width=True)
+        st.session_state['check_box'][idx] = st.checkbox(name, key=name)
 
-submitted = st.button('test',on_click=test_btn_evnt)
+submitted = st.button('test')   #,on_click=test_btn_evnt)
 
 if submitted:
+    st.session_state["file_uploader_key"] += 1
+    test_btn_evnt()
     st.rerun()
 
 if st.button('분석'):
