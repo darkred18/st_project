@@ -9,26 +9,11 @@ from my_utils.getWinNumsToCSV import crawlingLottoData, analyze_nums
 
 if 'file_uploader_key' not in st.session_state:
     st.session_state['file_uploader_key']   = 0
-    st.session_state['button_label']    = "Load"
+    # st.session_state['button_label']    = "Load"
     st.session_state['file_uploader']   = []
     st.session_state['load_imgs']       = []
     st.session_state['load_names']      = []
-    st.session_state['check_box']       = []
-    # st.session_state['names'] = {}
-
-# def image_resize(f_imgs):
-#     #이미지가 자동으로 회전되는 현상을 막아줌.
-#     #ImageOps.exif_transpose(image)
-#     imgs = [ImageOps.exif_transpose(Image.open(f)) for f in f_imgs]
-
-#     for img in imgs:
-#         w,h = img.size
-#         img_width = 640 if w > h else 480
-#         if w <= img_width: continue
-#         img_ratio = img_width/float(w)
-#         img_height = int((h * img_ratio)) 
-#         img = img.resize((img_width,img_height))
-#     return imgs
+    st.session_state['check_res']       = []
 
 
 
@@ -41,16 +26,7 @@ css = """
                 width: 1.5rem;
             }
             
-        img {
-            max-height: 300px;
-        }
-        img:hover {
-            transform: scale(1);
-            border:1px solid blue;
-        }
-        img:active {
-            transform: scale(1.1);
-        }
+        
         .uploadedFiles {
             display: none;
         }
@@ -60,11 +36,11 @@ st.markdown(css, unsafe_allow_html=True)
 
 def uploader_callback():
     if st.session_state['file_uploader'] != []:
-        st.session_state['button_label'] = "Clear"
+        # st.session_state['button_label'] = "Clear"
         # temp_cnt = len(st.session_state['file_uploader'])
         img_list = st.session_state['load_imgs']
         name_list = st.session_state['load_names']
-        check_list = st.session_state['check_box']
+        check_list = st.session_state['check_res']
 
         pre_img = len(img_list)
         
@@ -79,26 +55,26 @@ def uploader_callback():
 
         st.session_state['load_imgs']   = img_list
         st.session_state['load_names']  = name_list
-        st.session_state['check_box']   = check_list
+        st.session_state['check_res']   = check_list
     else:
-        st.session_state['button_label']    = "Load"
+        # st.session_state['button_label']    = "Load"
         st.session_state['load_imgs']       = st.session_state['file_uploader']
 
 def remove_image(idx_list):
+    temp = st.session_state['load_names']
     for i in reversed(idx_list):
         del st.session_state['load_names'][i]
-        del st.session_state['load_imgs'][1]
-        del st.session_state['check_box'][1]
+        del st.session_state['load_imgs'][i]
+        del st.session_state['check_res'][i]
 
 def test_btn_evnt():
-    chk_box = st.session_state['check_box'] 
+    chk_box = st.session_state['check_res'] 
     checked = []
     for i,chk in enumerate(chk_box):
         if chk:
             checked.append(i)
     
     remove_image(checked)
-
     # st.write(checked)
     # st.write(st.session_state['load_names'])
     # st.write('체크박스 개수 :  %d'%len(chk_box) )
@@ -120,16 +96,21 @@ for idx, filteredImage in enumerate(st.session_state['load_imgs']):
     name = st.session_state['load_names'][idx]
     with next(cols):
         st.image(filteredImage, use_column_width=True)
-        st.session_state['check_box'][idx] = st.checkbox(name, key=name)
+        st.session_state['check_res'][idx] = st.checkbox(name, key=name)
 
-submitted = st.button('test')   #,on_click=test_btn_evnt)
+c3_1, c3_2 = st.columns([5, 1])
+with c3_1:
+    btn_anal = st.button('분석', use_container_width=True)
+with c3_2:
+    # submitted = st.form_submit_button(st.session_state['button_label'],on_click=uploader_callback)
+    btn_del = st.button("Clear", use_container_width=True)   #,on_click=test_btn_evnt)
 
-if submitted:
+if btn_del:
     st.session_state["file_uploader_key"] += 1
     test_btn_evnt()
     st.rerun()
 
-if st.button('분석'):
+if btn_anal:
     res = qr_reader.get_number_from_image(st.session_state['load_imgs'])
     if res == []:
         st.write('qr코드 읽지 못함.')
@@ -148,7 +129,16 @@ if st.button('분석'):
 # streamlit -----------------------------------------
 
 
-
+# img {
+#             max-height: 300px;
+#         }
+#         img:hover {
+#             transform: scale(1);
+#             border:1px solid blue;
+#         }
+#         img:active {
+#             transform: scale(1.1);
+#         }
 # [data-testid="StyledFullScreenButton"] {
 #             right: 0;
 #             top: 0;
