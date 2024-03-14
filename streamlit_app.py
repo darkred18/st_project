@@ -82,6 +82,7 @@ def btn_clear_all():
     st.session_state['load_imgs'] = []
     st.session_state['check_res'] = []
 
+
 def btn_clear_select():
     chk_box = st.session_state['check_res'] 
     checked = [i for i,chk in enumerate(chk_box) if chk]
