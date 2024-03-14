@@ -1,24 +1,26 @@
 import streamlit as st
 from itertools import cycle
-# from PIL import Image
-# from PIL import ImageOps
-
 import qr_reader
 from my_utils.getWinNumsToCSV import crawlingLottoData, analyze_nums
-
+import time
 
 if 'file_uploader_key' not in st.session_state:
     st.session_state['file_uploader_key']   = 0
     # st.session_state['button_label']    = "Load"
+    st.session_state['btn_clicked']      = False
     st.session_state['file_uploader']   = []
     st.session_state['load_imgs']       = []
     st.session_state['load_names']      = []
     st.session_state['check_res']       = []
 
-
-
 css = """
     <style>
+        
+        [data-testid="stButton"] 'update DB'{
+        
+            padding-top: 50px;
+}
+
         [data-testid="StyledFullScreenButton"] {
                 right: 0;
                 top: 0;
@@ -30,11 +32,18 @@ css = """
         .uploadedFiles {
             display: none;
         }
+
+        #MainMenu {visibility: hidden;}
+        .stDeployButton {display:none;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+
     </style>
 """
 st.markdown(css, unsafe_allow_html=True)
 
 def uploader_callback():
+    stime = time.time()
     if st.session_state['file_uploader'] != []:
         # st.session_state['button_label'] = "Clear"
         # temp_cnt = len(st.session_state['file_uploader'])
@@ -57,8 +66,9 @@ def uploader_callback():
         st.session_state['load_names']  = name_list
         st.session_state['check_res']   = check_list
     else:
-        # st.session_state['button_label']    = "Load"
-        st.session_state['load_imgs']       = st.session_state['file_uploader']
+        st.session_state['load_imgs']   = st.session_state['file_uploader']
+
+    print('uploader_callback : %f'%(time.time() - stime))
 
 def remove_image(idx_list):
     temp = st.session_state['load_names']
@@ -67,50 +77,65 @@ def remove_image(idx_list):
         del st.session_state['load_imgs'][i]
         del st.session_state['check_res'][i]
 
-def test_btn_evnt():
+def btn_clear_all():
+    st.session_state['load_names'] = []
+    st.session_state['load_imgs'] = []
+    st.session_state['check_res'] = []
+
+def btn_clear_select():
     chk_box = st.session_state['check_res'] 
-    checked = []
-    for i,chk in enumerate(chk_box):
-        if chk:
-            checked.append(i)
-    
+    checked = [i for i,chk in enumerate(chk_box) if chk]
     remove_image(checked)
-    # st.write(checked)
-    # st.write(st.session_state['load_names'])
-    # st.write('체크박스 개수 :  %d'%len(chk_box) )
-    # st.write('이미지 개수 :  %d'%len(st.session_state['load_names']) )
-    
+    # checked = []
+    # for i,chk in enumerate(chk_box):
+    #     if chk:
+    #         checked.append(i)
 
 
 # streamlit =======================================
 
-uploaded_images = st.file_uploader('image : ', key=st.session_state['file_uploader_key'],
-                            accept_multiple_files=True )
+col1, col2 = st.columns([5, 1])
+with col1:
+    uploaded_images = st.file_uploader('image : ', 
+                                       key=st.session_state['file_uploader_key'],
+                                        accept_multiple_files=True )
+with col2:
+    if st.button("update DB", use_container_width=True):
+        pass
 
 if uploaded_images:
     st.session_state['file_uploader'] = uploaded_images
+    
     uploader_callback()
+    
+    
+    st.session_state["file_uploader_key"] += 1
+    st.rerun()
 
+stime = time.time()
 cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
 for idx, filteredImage in enumerate(st.session_state['load_imgs']):
     name = st.session_state['load_names'][idx]
     with next(cols):
         st.image(filteredImage, use_column_width=True)
         st.session_state['check_res'][idx] = st.checkbox(name, key=name)
+print('image display : %f'%(time.time()-stime))
 
-c3_1, c3_2 = st.columns([5, 1])
+c3_1, c3_2 = st.columns([3, 1])
+
+stime = time.time()
 with c3_1:
-    btn_anal = st.button('분석', use_container_width=True)
+    if st.button("선택한 이미지 삭제", use_container_width=True):
+        btn_clear_select()
+        st.rerun()
 with c3_2:
-    # submitted = st.form_submit_button(st.session_state['button_label'],on_click=uploader_callback)
-    btn_del = st.button("Clear", use_container_width=True)   #,on_click=test_btn_evnt)
+    if st.button("모든 이미지 삭제", use_container_width=True):
+        btn_clear_all()
+        st.rerun()
+print('image clear : %f'%(time.time()-stime))
 
-if btn_del:
-    st.session_state["file_uploader_key"] += 1
-    test_btn_evnt()
-    st.rerun()
 
-if btn_anal:
+if st.button('분석', use_container_width=True):
     res = qr_reader.get_number_from_image(st.session_state['load_imgs'])
     if res == []:
         st.write('qr코드 읽지 못함.')
@@ -124,6 +149,7 @@ if btn_anal:
                     st.text(str(n))
             else:
                 st.write(round + '회차 낙첨')
+
 
 
 # streamlit -----------------------------------------

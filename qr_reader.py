@@ -1,7 +1,7 @@
 from pyzbar.pyzbar import decode
 from PIL import Image, ImageOps
 from pprint import pprint
-import re, glob
+import re, glob,time
 
 
 def get_number_qr(code):
@@ -39,17 +39,23 @@ def get_number_from_image(imgs:list):
     return res
 
 def image_resize(f_imgs):
+    stime = time.time()
     #이미지가 자동으로 회전되는 현상을 막아줌.
     #ImageOps.exif_transpose(image)
     imgs = [ImageOps.exif_transpose(Image.open(f)) for f in f_imgs]
+    print('image open : %f'%(time.time()-stime))
+    
 
-    for img in imgs:
-        w,h = img.size
+    stime = time.time()
+    for i in range(len(imgs)):
+        w,h = imgs[i].size
         img_width = 640 if w > h else 480
         if w <= img_width: continue
         img_ratio = img_width/float(w)
         img_height = int((h * img_ratio)) 
-        img = img.resize((img_width,img_height))
+        rimg = imgs[i].resize((img_width,img_height))
+        imgs[i] = rimg
+    print('image_resize : %f'%(time.time()-stime))
     return imgs
 
 if __name__ == '__main__':
