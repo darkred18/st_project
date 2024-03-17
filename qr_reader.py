@@ -26,13 +26,7 @@ def get_number_from_image(imgs:list):
         res_img = []
         for dc in decoded:
             d_data = dc.data.decode('utf-8')
-            # d_type = dc.type
-            # print('======================')
-            # print('d_data : ', d_data)
             round, nums = get_number_qr(d_data)
-            # print('회차 : ', round)
-            # pprint(nums)
-            # print('----------------------')
             if round is not None:
                 res_img.append((round,nums))
         res.append(res_img)

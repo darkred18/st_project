@@ -13,15 +13,13 @@ import pandas as pd
 
 db_path = 'my_utils/lotto_number_DB.csv'
 
-def crawlingLottoData(fullPath, update = True):
-
-    model = pd.read_csv(fullPath)
+def crawlingLottoData( update = True):
+    model = pd.read_csv(db_path)
     round_num = model["회차"].to_list()[-1]
     date = model["추첨일"].to_list()[-1]
-
     
     if update:
-        round_num, date =  update_lotto_db(fullPath, round_num+1)
+        round_num, date =  update_lotto_db(db_path, round_num+1)
 
     print("round_num : ", round_num)
     dbInfo = "회차 : " + str(round_num) + ", 추첨일 : " + date

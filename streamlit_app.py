@@ -6,8 +6,6 @@ import time
 
 if 'file_uploader_key' not in st.session_state:
     st.session_state['file_uploader_key']   = 0
-    # st.session_state['button_label']    = "Load"
-    st.session_state['btn_clicked']      = False
     st.session_state['file_uploader']   = []
     st.session_state['load_imgs']       = []
     st.session_state['load_names']      = []
@@ -45,8 +43,6 @@ st.markdown(css, unsafe_allow_html=True)
 def uploader_callback():
     stime = time.time()
     if st.session_state['file_uploader'] != []:
-        # st.session_state['button_label'] = "Clear"
-        # temp_cnt = len(st.session_state['file_uploader'])
         img_list = st.session_state['load_imgs']
         name_list = st.session_state['load_names']
         check_list = st.session_state['check_res']
@@ -82,15 +78,10 @@ def btn_clear_all():
     st.session_state['load_imgs'] = []
     st.session_state['check_res'] = []
 
-
 def btn_clear_select():
     chk_box = st.session_state['check_res'] 
     checked = [i for i,chk in enumerate(chk_box) if chk]
     remove_image(checked)
-    # checked = []
-    # for i,chk in enumerate(chk_box):
-    #     if chk:
-    #         checked.append(i)
 
 
 # streamlit =======================================
@@ -102,7 +93,7 @@ with col1:
                                         accept_multiple_files=True )
 with col2:
     if st.button("update DB", use_container_width=True):
-        pass
+        crawlingLottoData()
 
 if uploaded_images:
     st.session_state['file_uploader'] = uploaded_images
