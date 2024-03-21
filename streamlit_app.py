@@ -26,16 +26,6 @@ css = """
                 width: 1.5rem;
             }
             
-        
-        .uploadedFiles {
-            display: none;
-        }
-
-        #MainMenu {visibility: hidden;}
-        .stDeployButton {display:none;}
-        footer {visibility: hidden;}
-        #stDecoration {display:none;}
-
     </style>
 """
 st.markdown(css, unsafe_allow_html=True)
