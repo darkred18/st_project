@@ -2,7 +2,7 @@ import streamlit as st
 from itertools import cycle
 import qr_reader
 from my_utils.getWinNumsToCSV import crawlingLottoData, analyze_nums
-import time
+
 
 if 'file_uploader_key' not in st.session_state:
     st.session_state['file_uploader_key']   = 0
@@ -31,7 +31,7 @@ css = """
 st.markdown(css, unsafe_allow_html=True)
 
 def uploader_callback():
-    stime = time.time()
+    # stime = time.time()
     if st.session_state['file_uploader'] != []:
         img_list = st.session_state['load_imgs']
         name_list = st.session_state['load_names']
@@ -54,7 +54,7 @@ def uploader_callback():
     else:
         st.session_state['load_imgs']   = st.session_state['file_uploader']
 
-    print('uploader_callback : %f'%(time.time() - stime))
+    # print('uploader_callback : %f'%(time.time() - stime))
 
 def remove_image(idx_list):
     temp = st.session_state['load_names']
@@ -76,62 +76,75 @@ def btn_clear_select():
 
 # streamlit =======================================
 
-col1, col2 = st.columns([5, 1])
-with col1:
-    uploaded_images = st.file_uploader('image : ', 
-                                       key=st.session_state['file_uploader_key'],
-                                        accept_multiple_files=True )
-with col2:
-    if st.button("update DB", use_container_width=True):
-        crawlingLottoData()
+# 탭 생성 : 첫번째 탭의 이름은 Tab A 로, Tab B로 표시합니다. 
+tab1, tab2= st.tabs(['Tab A' , 'Tab B'])
 
-if uploaded_images:
-    st.session_state['file_uploader'] = uploaded_images
+with tab1:
+    #tab A 를 누르면 표시될 내용
+    st.write('hello')
     
-    uploader_callback()
+
     
-    
-    st.session_state["file_uploader_key"] += 1
-    st.rerun()
+    col1, col2 = st.columns([5, 1])
+    with col1:
+        uploaded_images = st.file_uploader('image : ', 
+                                        key=st.session_state['file_uploader_key'],
+                                            accept_multiple_files=True )
+    with col2:
+        if st.button("update DB", use_container_width=True):
+            crawlingLottoData()
 
-stime = time.time()
-cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
-for idx, filteredImage in enumerate(st.session_state['load_imgs']):
-    name = st.session_state['load_names'][idx]
-    with next(cols):
-        st.image(filteredImage, use_column_width=True)
-        st.session_state['check_res'][idx] = st.checkbox(name, key=name)
-print('image display : %f'%(time.time()-stime))
-
-c3_1, c3_2 = st.columns([3, 1])
-
-stime = time.time()
-with c3_1:
-    if st.button("선택한 이미지 삭제", use_container_width=True):
-        btn_clear_select()
+    if uploaded_images:
+        st.session_state['file_uploader'] = uploaded_images
+        
+        uploader_callback()
+        
+        
+        st.session_state["file_uploader_key"] += 1
         st.rerun()
-with c3_2:
-    if st.button("모든 이미지 삭제", use_container_width=True):
-        btn_clear_all()
-        st.rerun()
-print('image clear : %f'%(time.time()-stime))
+
+    # stime = time.time()
+    cols = cycle(st.columns(4)) # st.columns here since it is out of beta at the time I'm writing this
+    for idx, filteredImage in enumerate(st.session_state['load_imgs']):
+        name = st.session_state['load_names'][idx]
+        with next(cols):
+            st.image(filteredImage, use_column_width=True)
+            st.session_state['check_res'][idx] = st.checkbox(name, key=name)
+    # print('image display : %f'%(time.time()-stime))
+
+    c3_1, c3_2 = st.columns([3, 1])
+
+    # stime = time.time()
+    with c3_1:
+        if st.button("선택한 이미지 삭제", use_container_width=True):
+            btn_clear_select()
+            st.rerun()
+    with c3_2:
+        if st.button("모든 이미지 삭제", use_container_width=True):
+            btn_clear_all()
+            st.rerun()
+    # print('image clear : %f'%(time.time()-stime))
 
 
-if st.button('분석', use_container_width=True):
-    res = qr_reader.get_number_from_image(st.session_state['load_imgs'])
-    if res == []:
-        st.write('qr코드 읽지 못함.')
-    else:
-        for r in res:
-            round, nums = r[0]
-            res = analyze_nums(int(round),nums)
-            if res:
-                st.write(round + '회차 당첨')
-                for n in nums:
-                    st.text(str(n))
-            else:
-                st.write(round + '회차 낙첨')
+    if st.button('분석', use_container_width=True):
+        res = qr_reader.get_number_from_image(st.session_state['load_imgs'])
+        if res == []:
+            st.write('qr코드 읽지 못함.')
+        else:
+            for r in res:
+                round, nums = r[0]
+                win, res = analyze_nums(int(round),nums)
+                if res:
+                    st.write(round + '회차 당첨')
+                    st.write( '당첨번호 : ' + str(win))
+                    for n in res:
+                        st.text(str(n))
+                else:
+                    st.write(round + '회차 낙첨')
 
+with tab2:
+    #tab B를 누르면 표시될 내용 
+    st.write('hi')
 
 
 # streamlit -----------------------------------------

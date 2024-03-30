@@ -145,15 +145,16 @@ def update_lotto_db(path, idx):
 
 def analyze_nums(round ,nums):
     df = pd.read_csv(db_path,index_col='회차')
-    win_nums = df.loc[round,'No.1':'No.6']
+    win_nums = df.loc[round,'No.1':'No.6'].values
     # print(round)
     # print(win_nums.values)
     res_nums = []
     for num in nums:
-        res_num = list(set(num) & set(win_nums.values))
-        if len(res_num) > 3:
+        res_num = list(set(num) & set(win_nums))
+        if len(res_num) > 2:
+            res_num.sort()
             res_nums.append(res_num)
-    return res_nums
+    return win_nums, res_nums
         
         
 # 연금 복권
